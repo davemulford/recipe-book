@@ -32,8 +32,6 @@ namespace RecipeBook
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-            Configuration["Data:DefaultConnection:ConnectionString"] = $@"Data Source={appEnv.ApplicationBasePath}/RecipeBook.db";
-
         }
 
         public IConfigurationRoot Configuration { get; set; }
