@@ -35,6 +35,7 @@ CREATE TABLE "AspNetUserLogins" (
   "UserId" varchar(128) NOT NULL,
   "LoginProvider" varchar(128) NOT NULL,
   "ProviderKey" varchar(128) NOT NULL,
+  "ProviderDisplayName" varchar(128) NOT NULL,
   PRIMARY KEY ("UserId", "LoginProvider", "ProviderKey")
 );
 

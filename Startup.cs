@@ -23,6 +23,13 @@ namespace RecipeBook
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                
+            // The following items need to be added to user-secrets.
+            //  * Authentication:Facebook:AppId
+            //  * Authentication:Facebook:AppSecret
+            //  * Data:RecipeBookConnection:ConnectionString
+            // For more info, see https://github.com/aspnet/UserSecrets and https://github.com/aspnet/Home/wiki/DNX-Secret-Configuration 
+            builder.AddUserSecrets();
 
             if (env.IsDevelopment())
             {
@@ -42,8 +49,8 @@ namespace RecipeBook
             // Add framework services.
             services.AddEntityFramework()
                 .AddNpgsql()
-                .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseNpgsql(Configuration["Data:DefaultConnection:ConnectionString"]));
+                .AddDbContext<RecipeDbContext>(options => options.UseNpgsql(Configuration["Data:RecipeBookConnection:ConnectionString"]))
+                .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(Configuration["Data:RecipeBookConnection:ConnectionString"]));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -91,6 +98,11 @@ namespace RecipeBook
             app.UseIdentity();
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
+            app.UseFacebookAuthentication(options =>
+            {
+                options.AppId = Configuration["Authentication:Facebook:AppId"];
+                options.AppSecret= Configuration["Authentication:Facebook:AppSecret"];
+            });
 
             app.UseMvc(routes =>
             {
