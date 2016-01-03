@@ -13,5 +13,5 @@
 
 @foreach (var recipe in Model.Recipes)
 {
-    <div>@recipe.Name</div>
+    <div><a asp-controller="Home" asp-action="ViewRecipe" asp-route-id="@recipe.Id">@recipe.Name</a></div>
 }

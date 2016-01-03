@@ -1,0 +1,12 @@
+@using RecipeBook.ViewModels.Home
+@model RecipeViewModel
+    
+@{
+    ViewData["Title"] = "View Recipe";
+}
+
+<h2>@Model.Recipe.Name</h2>
+
+<p markdown>
+    @Model.Recipe.RecipeText
+</p>

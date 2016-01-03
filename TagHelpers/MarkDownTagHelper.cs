@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using MarkdownSharp;
 using Microsoft.AspNet.Razor.TagHelpers;
 
 namespace RecipeBook.TagHelpers
@@ -5,13 +7,14 @@ namespace RecipeBook.TagHelpers
     [HtmlTargetElement("p", Attributes = "markdown")]
     public class MarkDownTagHelper : TagHelper
     {
-        public void Process(TagHelperContent context, TagHelperOutput output)
+        private static readonly Markdown MarkdownParser = new Markdown();
+        
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            string content = context.GetContent();            
-            var markDownParser = new MarkdownSharp.Markdown();
-            string markDownHtml = markDownParser.Transform(content);
+            var childContent = await output.GetChildContentAsync();            
+            string transformedContent = MarkdownParser.Transform(childContent.GetContent().Replace("&#xD;&#xA;", "\r\n"));
             
-            output.Content.SetHtmlContent(markDownHtml);
+            output.Content.SetHtmlContent(transformedContent);
         }
     }    
 }

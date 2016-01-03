@@ -39,6 +39,7 @@ namespace RecipeBook.Controllers
             return View();
         }
         
+        [HttpPost]
         public async Task<IActionResult> SaveRecipe(CreateRecipeViewModel recipe)
         {
             // Forward to login page if user not signed in
@@ -57,6 +58,24 @@ namespace RecipeBook.Controllers
                 };
                 
                 return View("Index", model);
+            }
+        }
+        
+        public IActionResult ViewRecipe(int id)
+        {
+            // Forward to login page if user not signed in
+            if (!User.IsSignedIn())
+                return RedirectToAction("Login", "Account");
+                
+            using (var recipeManager = new RecipeManager())
+            {
+                var model = new RecipeViewModel
+                {
+                    Recipe = recipeManager.GetRecipeById(id)
+                };
+                
+                Console.WriteLine("HomeController:ViewRecipe got recipe -> id={0} name={1}", model.Recipe.Id, model.Recipe.Name);
+                return View(model);             
             }
         }
 

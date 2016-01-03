@@ -10,6 +10,7 @@ namespace RecipeBook.ViewModels.Home
         
         [Required]
         [Display(Name = "Recipe text")]
+        [DataType(DataType.MultilineText)]
         public string RecipeText { get; set; }
     }
 }

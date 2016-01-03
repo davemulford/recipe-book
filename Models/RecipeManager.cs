@@ -21,12 +21,47 @@ namespace RecipeBook.Models
                 recipedb.Dispose();
             }
         }
+        
+        public Recipe GetRecipeById(int recipeId)
+        {
+            try
+            {
+                Console.WriteLine("RecipeManager:GetRecipeById -> find recipe with id {0}", recipeId);
+                return recipedb.Recipes
+                    .Where(r => r.Id == recipeId)
+                    .ToList()
+                    .Select(r => new Recipe
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        Name = r.Name,
+                        RecipeText = HtmlDecode(r.RecipeText) 
+                    })
+                    .SingleOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception was thrown when retrieving a recipe with id {recipeId}.");
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
 
         public List<Recipe> GetRecipesForUser(string userId)
         {
             try
             {
-                return recipedb.Recipes.Where(r => r.UserId == userId).ToList();
+                return recipedb.Recipes
+                    .Where(r => r.UserId == userId)
+                    .ToList()
+                    .Select(r => new Recipe
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        Name = r.Name,
+                        RecipeText = HtmlDecode(r.RecipeText) 
+                    })
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -41,22 +76,48 @@ namespace RecipeBook.Models
         {
             try
             {
+                Console.WriteLine(recipeText.ToList().Select(c => Convert.ToInt32(c).ToString()).Aggregate((sb,c) => String.Concat(sb, "-", c)));
+                
                 var recipe = new Recipe
                 {
                     UserId = userId,
                     Name = recipeName,
-                    RecipeText = recipeText
+                    RecipeText = HtmlEncode(recipeText)
                 };
                 
                 recipedb.Recipes.Add(recipe);
                 await recipedb.SaveChangesAsync();
                 return;
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                
-                throw;
+                Console.WriteLine("Exception was thrown when saving a recipe. userId={0} recipeName={1} recipeText={2}", userId, recipeName, recipeText);
+                Console.WriteLine(ex.ToString());
+                return;
             }
+        }
+        
+        /*
+         * Encodes an html string.
+         * THIS METHOD SHOULD ONLY BE USED UNTIL COREFX HAS AN HTMLDECODE METHOD.
+         */
+        private string HtmlEncode(string html)
+        {
+            return html.ToList().Select(c => Convert.ToInt32(c).ToString()).Aggregate((sb,c) => String.Concat(sb, "-", c));
+        }
+        
+        /*
+         * Decodes an html string.
+         * THIS METHOD SHOULD ONLY BE USED UNTIL COREFX HAS AN HTMLDECODE METHOD.
+         */
+        private string HtmlDecode(string encodedText)
+        {
+            return new String(
+                encodedText
+                    .Split('-')
+                    .Select(s => Convert.ToChar(Int32.Parse(s)))
+                    .ToArray()
+                );
         }
     }
 }
